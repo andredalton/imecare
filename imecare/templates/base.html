@@ -12,19 +12,37 @@
         <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.min.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "css/imecare.css" %}" />
     {% endblock %}
+
     <script src="{% static "js/jquery-1.11.3.min.js" %}"></script>
     <script src="{% static "jquery-ui-1.11.4/jquery-ui.min.js" %}"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
 
     {% block javascript %}
-        <script src="/static/js/jquery-1.2.6.pack.js"></script>
-        <script src="/static/js/jquery.maskedinput-1.1.4.pack.js"></script>
+        <script src="/static/js/jquery.mask.min.js"></script>
+    {% endblock %}
+
+    {% block validators %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('.cpf').mask('000.000.000-00', {selectOnFocus: true, clearIfNotMatch: true, placeholder: "___.___.___-__"});
+                $('#id_rg').mask("00.000.000-0", {selectOnFocus: true, clearIfNotMatch: true, placeholder: "__.___.___-_"});
+            });
+        </script>
     {% endblock %}
 
     {% block jquery %}
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $("#id_cpf").mask("999.999.999-99");
+        <script>
+            $(function() {
+                $( ".datepicker" ).datepicker({
+                    dateFormat: 'dd/mm/yy',
+                    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+                    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+                    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                    nextText: 'Próximo',
+                    prevText: 'Anterior'
+                });
             });
         </script>
     {% endblock %}
@@ -49,20 +67,20 @@
         {% endif %}
         {% if user.is_staff %}
             <a href="/consulta/">Nova consulta</a>
-            <a href="/pacientes/">Pacientes</a>
-        {% else %}
-            <a href="/">{% trans 'Minhas consultas' %}</a>
-            <a href="/">{% trans 'Meus procedimentos' %}</a>
+            <a href="/pacientes/">Meus pacientes</a>
         {% endif %}
+        <a href="/">{% trans 'Minhas consultas' %}</a>
+        <a href="/">{% trans 'Meus procedimentos' %}</a>
         <a href="/trocar_senha/">{% trans 'Alterar senha' %}</a>
         <a href="/sair/">{% trans 'Sair' %}</a>
     {% else %}
         <form method="post" action="/entrar/"> {% csrf_token %}
-            CPF/CRM: <input id="id_cpf" type="text" name="cpf" />
+            CPF: <input class="cpf" type="text" name="cpf" />
             Senha: <input type="password" name="senha" />
             <input type="submit" value="Entrar" />
         </form>
-        <a href="/novo_paciente/">Cadastre-se</a>
+        Paciente, cadastre-se <a href="/novo_paciente/">aqui</a><br />
+        Médico, cadastre-se <a href="/novo_medico/">aqui</a>
     {% endif %}
     </div>
     {% endblock %}
