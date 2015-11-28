@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %} - Novo cliente{% endblock %}
+
+{% block javascript %}
+    <script src="/static/js/jquery-1.2.6.pack.js"></script>
+    <script src="/static/js/jquery.maskedinput-1.1.4.pack.js"></script>
+{% endblock %}
+
+{% block jquery %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#id_cpf").mask("999.999.999-99");
+            $('#id_rg').mask("99.999.999-9");
+            $('#id_celular').mask("(99) 99999-9999");
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Novo paciente</h1>
+        <div id="content-main">
+            <form method="POST">{% csrf_token %}
+                <div>
+                    <fieldset class="module aligned wide">
+                        {% for field in form %}
+                            <div class="form-row">
+                                {{ field.errors }}
+                                {{ field.label_tag }} {{ field }}
+                                {% if field.help_text %}
+                                <p class="help">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <div class="submit-row">
+                        <input type="submit" value="Salvar" class="default" />
+                    </div>
+                    <script type="text/javascript">document.getElementById("id_nome_de_usuario").focus();</script>
+                </div>
+            </form>
+        </div>
+        <br class="clear" />
+    </div>
+    <div id="footer"></div>
+{% endblock %}
