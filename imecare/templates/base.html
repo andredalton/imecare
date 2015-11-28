@@ -16,8 +16,19 @@
     <script src="{% static "jquery-ui-1.11.4/jquery-ui.min.js" %}"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
 
-    {% block javascript %}{% endblock %}
-    {% block jquery %}{% endblock %}
+    {% block javascript %}
+        <script src="/static/js/jquery-1.2.6.pack.js"></script>
+        <script src="/static/js/jquery.maskedinput-1.1.4.pack.js"></script>
+    {% endblock %}
+
+    {% block jquery %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#id_cpf").mask("999.999.999-99");
+            });
+        </script>
+    {% endblock %}
+
     {% block extrastyle %}{% endblock %}
     {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
     {% block extrahead %}{% endblock %}
@@ -46,9 +57,10 @@
         <a href="/trocar_senha/">{% trans 'Alterar senha' %}</a>
         <a href="/sair/">{% trans 'Sair' %}</a>
     {% else %}
-        <form method="post" action="/login/">
-            CPF/CRM: <input type="text" name="username" />
+        <form method="post" action="/entrar/"> {% csrf_token %}
+            CPF/CRM: <input id="id_cpf" type="text" name="cpf" />
             Senha: <input type="password" name="senha" />
+            <input type="submit" value="Entrar" />
         </form>
         <a href="/novo_paciente/">Cadastre-se</a>
     {% endif %}

@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'imecare.views.home', name='home'),
-    url(r'^novo_paciente/?$', 'imecare.views.novo_usuario', name='registro'),
-    url(r'^login/', auth_views.login, name='login'),
+    url(r'^novo_paciente/?$', 'imecare.views.novo_paciente', name='registro'),
+    url(r'^entrar/?', 'imecare.views.login_user', name='login'),
+    url(r'^sair/?', 'imecare.views.login_user', name='login'),
 ]

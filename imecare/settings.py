@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for imecare project.
 
@@ -109,3 +110,12 @@ STATIC_URL = '/static/'
 
 # Arrumando redirecionamento depois do login.
 LOGIN_REDIRECT_URL = "/"
+
+# Configuração de envio de email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'linux.ime.usp.br'
+EMAIL_PORT = 25
+EMAIL_USE_SSL = True
+# EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'imecare@linux.ime.usp.br'
+EMAIL_HOST_PASSWORD = 'projeto'

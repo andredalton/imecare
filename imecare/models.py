@@ -20,6 +20,9 @@ class Telefone(models.Model):
     contato = models.CharField(max_length=150, verbose_name='Nome do contato')
     parentesco = models.CharField(max_length=50)
 
+    class Meta:
+        unique_together = ('numero', 'contato', 'parentesco')
+
 class Paciente(User):
     nome = models.CharField(max_length=150)
     rg = models.CharField(max_length=50, verbose_name='RG', unique=True)
@@ -32,3 +35,4 @@ class Paciente(User):
         # Tornando o nome de usuário User igual ao cpf
         self.username = self.cpf
         return super(Paciente, self).save()
+
