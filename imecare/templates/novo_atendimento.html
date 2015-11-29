@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %} - Novo atendimento{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Novo atendimento</h1>
+        <div id="content-main">
+            <form method="POST">{% csrf_token %}
+                <div>
+                    <fieldset class="module aligned wide">
+                        {% for field in form %}
+                            <div class="form-row">
+                                {{ field.errors }}
+                                {{ field.label_tag }} {{ field }}
+                                {% if field.help_text %}
+                                <p class="help">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <div class="submit-row">
+                        <input type="submit" value="Salvar" class="default" />
+                    </div>
+                    <script type="text/javascript">document.getElementById("id_cpf").focus();</script>
+                </div>
+            </form>
+        </div>
+        <br class="clear" />
+    </div>
+    <div id="footer"></div>
+{% endblock %}

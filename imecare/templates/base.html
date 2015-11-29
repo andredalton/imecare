@@ -66,10 +66,10 @@
             <a target="_blank" href="{% url 'admin:index' %}auth/user/">Usuários</a>
         {% endif %}
         {% if user.is_staff %}
-            <a href="/consulta/">Nova consulta</a>
+            <a href="/atendimento/novo/">Novo atendimento</a>
             <a href="/pacientes/">Meus pacientes</a>
         {% endif %}
-        <a href="/">{% trans 'Minhas consultas' %}</a>
+        <a href="/atendimentos/">{% trans 'Meus atendimentos' %}</a>
         <a href="/">{% trans 'Meus procedimentos' %}</a>
         <a href="/trocar_senha/">{% trans 'Alterar senha' %}</a>
         <a href="/sair/">{% trans 'Sair' %}</a>

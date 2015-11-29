@@ -3,9 +3,11 @@ from socket import p
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, RequestContext, HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
-from forms import PacienteForm, MedicoForm
-from models import Paciente, Medico
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+
+from forms import PacienteForm, MedicoForm, AtendimentoForm
+from models import Pessoa, Atendimento
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
@@ -24,7 +26,7 @@ def home(request):
 def login_user(request, tipo):
     logout(request)
     if request.POST:
-        username = request.POST['cpf'] if tipo == 'paciente' else request.POST['cpf']
+        username = request.POST['cpf']
         password = request.POST['senha']
 
         user = authenticate(username=username, password=password)
@@ -33,7 +35,7 @@ def login_user(request, tipo):
                 login(request, user)
     return HttpResponseRedirect('/')
 
-
+@login_required
 def logout_user(request):
     logout(request)
     return HttpResponseRedirect('/')
@@ -45,9 +47,6 @@ def novo_paciente(request):
         form.save()
         cpf = request.POST['cpf']
         senha = request.POST['senha']
-        p = Paciente.objects.get(username=cpf)
-        p.set_password(senha)
-        p.save()
         user = authenticate(username=cpf, password=senha)
         if user is not None:
             if user.is_active:
@@ -65,10 +64,6 @@ def novo_medico(request):
         form.save()
         cpf = request.POST['cpf']
         senha = request.POST['senha']
-        m = Medico.objects.get(username=cpf)
-        m.set_password(senha)
-        m.is_staff = True
-        m.save()
         user = authenticate(username=cpf, password=senha)
         if user is not None:
             if user.is_active:
@@ -80,3 +75,23 @@ def novo_medico(request):
                               context_instance=RequestContext(request))
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def novo_atendimento(request):
+    form = AtendimentoForm(request.user, request.POST or None)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect('/')
+    context = {'form': form}
+    return render_to_response('novo_atendimento.html',
+                              context,
+                              context_instance=RequestContext(request))
+
+@login_required
+def atendimentos(request):
+    paciente = Pessoa.objects.get(cpf=request.user.username)
+    atendimentos = Atendimento.objects.filter(paciente=paciente)
+    context = {'atendimentos': atendimentos}
+    return render_to_response('atendimentos.html',
+                              context,
+                              context_instance=RequestContext(request))

@@ -22,47 +22,38 @@ def verifica_cpf(cpf):
 
 SANGUE_CHOICES = (
     ('A+', 'A+'),
-    ('A-', 'A-  .'),
+    ('A-', 'A-'),
     ('AB+', 'AB+'),
-    ('AB-', 'AB-.'),
+    ('AB-', 'AB-'),
     ('B+', 'B+'),
-    ('B-', 'B-.'),
+    ('B-', 'B-'),
     ('O+', 'O+'),
-    ('O-', 'O-.')
+    ('O-', 'O-')
 )
 
-class Telefone(models.Model):
-    numero = models.CharField(max_length=100, verbose_name='Número')
-    contato = models.CharField(max_length=150, verbose_name='Nome do contato')
-    parentesco = models.CharField(max_length=50)
 
-    class Meta:
-        unique_together = ('numero', 'contato', 'parentesco')
-
-class Paciente(User):
+class Pessoa(User):
     nome = models.CharField(max_length=150)
-    rg = models.CharField(max_length=50, verbose_name='RG', unique=True)
-    cpf = models.CharField(max_length=50, verbose_name='CPF', unique=True)
-    tipo_sanguineo = models.CharField(max_length=2, choices=SANGUE_CHOICES, verbose_name='Tipo sanguíneo')
+    rg = models.CharField(max_length=15, verbose_name='RG', unique=True)
+    cpf = models.CharField(max_length=15, verbose_name='CPF', unique=True)
+    crm = models.CharField(max_length=15, verbose_name='CRM', unique=True, null=True, blank=True)
+    tipo_sanguineo = models.CharField(max_length=3, choices=SANGUE_CHOICES, verbose_name='Tipo sanguíneo')
     data_nascimento = models.DateField(verbose_name='Data de nascimento')
-    telefones = models.ManyToManyField(Telefone)
 
     def save(self):
         # Tornando o nome de usuário User igual ao cpf
         self.username = self.cpf
         if verifica_cpf(self.cpf):
-            return super(Paciente, self).save()
+            return super(Pessoa, self).save()
 
-class Medico(User):
-    nome = models.CharField(max_length=150)
-    rg = models.CharField(max_length=50, verbose_name='RG', unique=True)
-    cpf = models.CharField(max_length=50, verbose_name='CPF', unique=True)
-    crm = models.CharField(max_length=50, verbose_name='CRM', unique=True)
-    data_nascimento = models.DateField(verbose_name='Data de nascimento')
-    telefones = models.ManyToManyField(Telefone)
+
+class Atendimento(models.Model):
+    medico = models.OneToOneField(Pessoa, related_name='medico')
+    paciente = models.OneToOneField(Pessoa, related_name='paciente')
+    comentarios = models.TextField(verbose_name='comentários')
+    data = models.DateField(auto_now=True)
+    horario = models.TimeField(auto_now=True)
 
     def save(self):
-        # Tornando o nome de usuário User igual ao crm e is_staff = True
-        self.username = self.cpf
-        if verifica_cpf(self.cpf):
-            return super(Medico, self).save()
+        if self.medico.is_staff:
+            return super(Atendimento, self).save()

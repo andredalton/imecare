@@ -25,4 +25,7 @@ urlpatterns = [
     url(r'^novo_medico/?$', 'imecare.views.novo_medico', name='registro_medico'),
     url(r'^entrar/(?P<tipo>\w{0,10})', 'imecare.views.login_user', name='login'),
     url(r'^sair/?', 'imecare.views.logout_user', name='logout'),
+    url(r'^atendimento/novo/?', 'imecare.views.novo_atendimento', name='registro_atendimento'),
+    url(r'^atendimentos/?', 'imecare.views.atendimentos', name='atendimentos'),
+
 ]

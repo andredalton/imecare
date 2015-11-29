@@ -14,13 +14,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Paciente',
+            name='Pessoa',
             fields=[
                 ('user_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
                 ('nome', models.CharField(max_length=150)),
-                ('rg', models.CharField(max_length=50, verbose_name=b'RG')),
-                ('cpf', models.CharField(max_length=50, verbose_name=b'CPF')),
-                ('tipo_sanguineo', models.CharField(max_length=2, verbose_name=b'Tipo sangu\xc3\xadneo', choices=[(b'A+', b'A+'), (b'A-', b'A-.'), (b'AB+', b'AB+'), (b'AB-', b'AB-.'), (b'B+', b'B+'), (b'B-', b'B-.'), (b'O+', b'O+'), (b'O-', b'O-.')])),
+                ('rg', models.CharField(unique=True, max_length=15, verbose_name=b'RG')),
+                ('cpf', models.CharField(unique=True, max_length=15, verbose_name=b'CPF')),
+                ('crm', models.CharField(max_length=15, unique=True, null=True, verbose_name=b'CRM', blank=True)),
+                ('tipo_sanguineo', models.CharField(max_length=2, verbose_name=b'Tipo sangu\xc3\xadneo', choices=[(b'A+', b'A+'), (b'A-', b'A-'), (b'AB+', b'AB+'), (b'AB-', b'AB-'), (b'B+', b'B+'), (b'B-', b'B-'), (b'O+', b'O+'), (b'O-', b'O-')])),
                 ('data_nascimento', models.DateField(verbose_name=b'Data de nascimento')),
             ],
             options={
@@ -32,19 +33,5 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
-        ),
-        migrations.CreateModel(
-            name='Telefone',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('numero', models.CharField(max_length=100, verbose_name=b'N\xc3\xbamero')),
-                ('contato', models.CharField(max_length=150, verbose_name=b'Nome do contato')),
-                ('parentesco', models.CharField(max_length=50)),
-            ],
-        ),
-        migrations.AddField(
-            model_name='paciente',
-            name='telefones',
-            field=models.ManyToManyField(to='imecare.Telefone'),
         ),
     ]

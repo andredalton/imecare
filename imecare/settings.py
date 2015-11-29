@@ -86,6 +86,17 @@ DATABASES = {
         'PASSWORD': 'projeto',
         'HOST': 'postgresql.linux.ime.usp.br',
         'PORT': 5432
+    },
+    'medico': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'OPTIONS': {
+            'options': '-c search_path=labbd,public'
+        },
+        'NAME': 'imecare',
+        'USER': 'medico',
+        'PASSWORD': 'projeto',
+        'HOST': 'postgresql.linux.ime.usp.br',
+        'PORT': 5432
     }
 }
 
