@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response, RequestContext, HttpResponseRed
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-from forms import PacienteForm, MedicoForm, AtendimentoForm
+from forms import PacienteForm, MedicoForm, AtendimentoForm, TrocarSenhaForm
 from models import Pessoa, Atendimento
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -93,5 +93,16 @@ def atendimentos(request):
     atendimentos = Atendimento.objects.filter(paciente=paciente)
     context = {'atendimentos': atendimentos}
     return render_to_response('atendimentos.html',
+                              context,
+                              context_instance=RequestContext(request))
+
+@login_required
+def trocar_senha(request):
+    form = TrocarSenhaForm(request, request.POST or None)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect('/')
+    context = {'form': form}
+    return render_to_response('trocar_senha.html',
                               context,
                               context_instance=RequestContext(request))

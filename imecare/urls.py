@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^sair/?', 'imecare.views.logout_user', name='logout'),
     url(r'^atendimento/novo/?', 'imecare.views.novo_atendimento', name='registro_atendimento'),
     url(r'^atendimentos/?', 'imecare.views.atendimentos', name='atendimentos'),
+    url(r'^trocar_senha/?', 'imecare.views.trocar_senha', name='trocar_senha'),
 
 ]

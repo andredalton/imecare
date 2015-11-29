@@ -2,7 +2,7 @@
 
 from django import forms
 from models import verifica_cpf, Pessoa, Atendimento
-
+from django.contrib.auth import authenticate, login
 
 def verificaPessoa(form, senha1, senha2, cpf):
     if not verifica_cpf(cpf):
@@ -114,3 +114,36 @@ class AtendimentoForm(forms.ModelForm):
         self.instance.paciente = paciente
         self.instance.medico = medico
         return self.cleaned_data
+
+class TrocarSenhaForm(forms.Form):
+    senha_antiga = forms.CharField(max_length=30, min_length=5, widget=forms.PasswordInput())
+    nova_senha = forms.CharField(max_length=30, min_length=5, widget=forms.PasswordInput())
+    repetir_senha = forms.CharField(max_length=30, min_length=5, widget=forms.PasswordInput())
+
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
+        super(TrocarSenhaForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        senha_antiga = self.cleaned_data.get('senha_antiga')
+        nova_senha = self.cleaned_data.get('nova_senha')
+        repetir_senha = self.cleaned_data.get('repetir_senha')
+
+        if nova_senha != repetir_senha:
+            self.add_error('nova_senha', "As senhas não são iguais.")
+            self.add_error('repetir_senha', "As senhas não são iguais.")
+        user = authenticate(username=self.request.user.username, password=senha_antiga)
+
+        if user and nova_senha == repetir_senha:
+            return self.cleaned_data
+        else:
+            self.add_error('senha_antiga', "A senha não confere.")
+        raise forms.ValidationError("Erro na autenticação.")
+
+    def save(self):
+        senha_antiga = self.cleaned_data.get('senha_antiga')
+        nova_senha = self.cleaned_data.get('nova_senha')
+        user = authenticate(username=self.request.user.username, password=senha_antiga)
+        user.set_password(nova_senha)
+        user.save()
+        login(self.request, user)
