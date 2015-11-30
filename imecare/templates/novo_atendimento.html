@@ -1,14 +1,57 @@
 {% extends "base.html" %}
 {% block title %} - Novo atendimento{% endblock %}
 
+{% block jquery %}
+    <script>
+        var proc_count = 1
+
+        var procedimentos = [
+            {% for p in procedimentos %}
+                {'value': '{{ p.nome }}', 'label': 'Nome: {{ p.nome }}'},
+                {'value': '{{ p.nome }}', 'label': 'Cod. Anvisa: {{ p.cod_anvisa }}'},
+            {% endfor %}
+        ]
+
+        $(function() {
+            function highlightText(text, $node) {
+                var searchText = $.trim(text).toLowerCase(), currentNode = $node.get(0).firstChild, matchIndex, newTextNode, newSpanNode;
+                while ((matchIndex = currentNode.data.toLowerCase().indexOf(searchText)) >= 0) {
+                    newTextNode = currentNode.splitText(matchIndex);
+                    currentNode = newTextNode.splitText(searchText.length);
+                    newSpanNode = document.createElement("span");
+                    newSpanNode.className = "highlight";
+                    currentNode.parentNode.insertBefore(newSpanNode, currentNode);
+                    newSpanNode.appendChild(newTextNode);
+                }
+            }
+
+            $(".proc_nome").autocomplete({
+                source: procedimentos
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>").text(item.label);
+                highlightText(this.term, $a);
+                return $("<li></li>").append($a).appendTo(ul);
+            };
+
+
+            $(".add_proc").click(function(){
+                proc_count += 1
+                $("#procedimento_div"+proc_count).fadeIn()
+                $(this).fadeOut()
+            })
+        });
+    </script>
+{% endblock %}
+
+
 {% block content %}
     <div id="content" class="colM">
         <h1>Novo atendimento</h1>
         <div id="content-main">
-            <form method="POST">{% csrf_token %}
+            <form id="principal" method="POST">{% csrf_token %}
                 <div>
                     <fieldset class="module aligned wide">
-                        {% for field in form %}
+                        {% for field in atendimento %}
                             <div class="form-row">
                                 {{ field.errors }}
                                 {{ field.label_tag }} {{ field }}
@@ -17,11 +60,22 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
+                        {% for solicita in solicitacoes %}
+                            <div class="form-row" id="procedimento_div{{ forloop.counter }}" {% if forloop.counter0 > 0 %}style="display: none;"{% endif %}>
+                                {{ solicita.procedimento_nome.errors }}
+                                {{ solicita.procedimento_nome.label_tag }} {{ solicita.procedimento_nome }}
+                                <a class="add_proc">mais</a>
+                                {% if solicita.procedimento_nome.help_text %}
+                                <p class="help">{{ solicita.procedimento_nome.help_text|safe }}</p>
+                                {% endif %}
+
+                            </div>
+                        {% endfor %}
                     </fieldset>
                     <div class="submit-row">
                         <input type="submit" value="Salvar" class="default" />
                     </div>
-                    <script type="text/javascript">document.getElementById("id_cpf").focus();</script>
+                    <script type="text/javascript">document.getElementById("id_atendimento-cpf").focus();</script>
                 </div>
             </form>
         </div>

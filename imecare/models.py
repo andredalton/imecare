@@ -48,12 +48,25 @@ class Pessoa(User):
 
 
 class Atendimento(models.Model):
-    medico = models.OneToOneField(Pessoa, related_name='medico')
-    paciente = models.OneToOneField(Pessoa, related_name='paciente')
+    medico = models.ForeignKey(Pessoa, related_name='medico')
+    paciente = models.ForeignKey(Pessoa, related_name='paciente')
     comentarios = models.TextField(verbose_name='comentários')
     data = models.DateField(auto_now=True)
     horario = models.TimeField(auto_now=True)
 
+    class Meta:
+        unique_together = (("medico", "paciente", "data", "horario"),)
+
     def save(self):
         if self.medico.is_staff:
             return super(Atendimento, self).save()
+
+
+class Procedimento(models.Model):
+    descricao = models.TextField(verbose_name='descrição')
+    nome = models.CharField(max_length=100, primary_key=True)
+
+
+class Solicita(models.Model):
+    procedimento = models.ForeignKey(Procedimento)
+    atendimento = models.ForeignKey(Atendimento)

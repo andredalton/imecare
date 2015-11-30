@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from django import forms
-from models import verifica_cpf, Pessoa, Atendimento
+from models import verifica_cpf, Pessoa, Atendimento, Solicita, Procedimento
 from django.contrib.auth import authenticate, login
 
 def verificaPessoa(form, senha1, senha2, cpf):
@@ -109,7 +109,11 @@ class AtendimentoForm(forms.ModelForm):
 
     def clean(self):
         cpf = self.cleaned_data.get('cpf')
-        paciente = Pessoa.objects.get(cpf=cpf)
+        try:
+            paciente = Pessoa.objects.get(cpf=cpf)
+        except Pessoa.DoesNotExist:
+            self.add_error('cpf', "Este CPF não está cadastrado.")
+            raise forms.ValidationError("CPF inválido.")
         medico = Pessoa.objects.get(cpf=self.user.username)
         self.instance.paciente = paciente
         self.instance.medico = medico
@@ -147,3 +151,36 @@ class TrocarSenhaForm(forms.Form):
         user.set_password(nova_senha)
         user.save()
         login(self.request, user)
+
+
+class SolicitaForm(forms.ModelForm):
+    procedimento_nome = forms.CharField(
+        max_length=100,
+        label='procedimento',
+        widget=forms.TextInput(
+            attrs={'class': 'proc_nome'}
+        )
+    )
+
+    class Meta:
+        model = Solicita
+        fields = (
+            'procedimento_nome',
+        )
+
+    def set_atendimento(self, atendimento):
+        self.instance.atendimento = atendimento
+
+    def clean(self):
+        procedimento_nome = self.cleaned_data.get('procedimento_nome')
+
+        try:
+            print "--", procedimento_nome
+            procedimento = Procedimento.objects.get(nome=procedimento_nome)
+        except Procedimento.DoesNotExist:
+            procedimento = None
+        if procedimento:
+            self.instance.procedimento = procedimento
+            return self.cleaned_data
+        self.add_error('procedimento_nome', "Digite um nome de procedimento válido.")
+        raise forms.ValidationError("Procedimento inválido.")

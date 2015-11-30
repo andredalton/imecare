@@ -6,8 +6,8 @@ from django.shortcuts import render_to_response, RequestContext, HttpResponseRed
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-from forms import PacienteForm, MedicoForm, AtendimentoForm, TrocarSenhaForm
-from models import Pessoa, Atendimento
+from forms import PacienteForm, MedicoForm, AtendimentoForm, TrocarSenhaForm, SolicitaForm
+from models import Pessoa, Atendimento, Procedimento
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
@@ -15,6 +15,8 @@ from django.http import *
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
+from django.db import transaction
+
 
 def home(request):
     context = {}
@@ -78,11 +80,22 @@ def novo_medico(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def novo_atendimento(request):
-    form = AtendimentoForm(request.user, request.POST or None)
-    if form.is_valid():
-        form.save()
-        return HttpResponseRedirect('/')
-    context = {'form': form}
+    nsolicita = 20
+    atendimento = AtendimentoForm(request.user, request.POST or None, prefix='atendimento')
+    solicitacoes = []
+    for i in xrange(nsolicita):
+        solicitacoes.append(SolicitaForm(request.POST or None, prefix='solicita'+str(i)))
+    procedimentos = Procedimento.objects.all()
+
+
+    if atendimento.is_valid():
+        atendimento = atendimento.save()
+        for solicita in solicitacoes:
+            solicita.set_atendimento(atendimento)
+            if solicita.is_valid():
+                solicita.save()
+        return HttpResponseRedirect('/atendimento/novo/')
+    context = {'atendimento': atendimento, 'solicitacoes': solicitacoes, 'procedimentos': procedimentos}
     return render_to_response('novo_atendimento.html',
                               context,
                               context_instance=RequestContext(request))
