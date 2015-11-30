@@ -157,6 +157,7 @@ class SolicitaForm(forms.ModelForm):
     procedimento_nome = forms.CharField(
         max_length=100,
         label='procedimento',
+        required=False,
         widget=forms.TextInput(
             attrs={'class': 'proc_nome'}
         )
@@ -166,6 +167,7 @@ class SolicitaForm(forms.ModelForm):
         model = Solicita
         fields = (
             'procedimento_nome',
+            'detalhes',
         )
 
     def set_atendimento(self, atendimento):
@@ -175,12 +177,12 @@ class SolicitaForm(forms.ModelForm):
         procedimento_nome = self.cleaned_data.get('procedimento_nome')
 
         try:
-            print "--", procedimento_nome
             procedimento = Procedimento.objects.get(nome=procedimento_nome)
         except Procedimento.DoesNotExist:
             procedimento = None
         if procedimento:
             self.instance.procedimento = procedimento
             return self.cleaned_data
-        self.add_error('procedimento_nome', "Digite um nome de procedimento válido.")
+        if len(procedimento_nome) > 0:
+            self.add_error('procedimento_nome', "Digite um nome de procedimento válido.")
         raise forms.ValidationError("Procedimento inválido.")

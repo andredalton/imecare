@@ -3,14 +3,13 @@
 
 {% block jquery %}
     <script>
-        var proc_count = 1
+        var proc_count = {{ proc_count }};
 
         var procedimentos = [
             {% for p in procedimentos %}
-                {'value': '{{ p.nome }}', 'label': 'Nome: {{ p.nome }}'},
-                {'value': '{{ p.nome }}', 'label': 'Cod. Anvisa: {{ p.cod_anvisa }}'},
+                {'value': '{{ p.nome }}', 'label': '{{ p.nome }}'},
             {% endfor %}
-        ]
+        ];
 
         $(function() {
             function highlightText(text, $node) {
@@ -35,10 +34,12 @@
 
 
             $(".add_proc").click(function(){
-                proc_count += 1
-                $("#procedimento_div"+proc_count).fadeIn()
+                proc_count += 1;
+                $("#proc_count").val(proc_count);
+                $("#procedimento_div"+proc_count).fadeIn();
+                $("#procedimento_div"+proc_count+"B").fadeIn();
                 $(this).fadeOut()
-            })
+            });;
         });
     </script>
 {% endblock %}
@@ -49,6 +50,7 @@
         <h1>Novo atendimento</h1>
         <div id="content-main">
             <form id="principal" method="POST">{% csrf_token %}
+                <input type="hidden" id="proc_count" name="proc_count" value="{{ proc_count }}" />
                 <div>
                     <fieldset class="module aligned wide">
                         {% for field in atendimento %}
@@ -61,14 +63,20 @@
                             </div>
                         {% endfor %}
                         {% for solicita in solicitacoes %}
-                            <div class="form-row" id="procedimento_div{{ forloop.counter }}" {% if forloop.counter0 > 0 %}style="display: none;"{% endif %}>
+                            <div class="form-row" id="procedimento_div{{ forloop.counter }}" {% if forloop.counter > proc_count %}style="display: none;"{% endif %}>
                                 {{ solicita.procedimento_nome.errors }}
                                 {{ solicita.procedimento_nome.label_tag }} {{ solicita.procedimento_nome }}
-                                <a class="add_proc">mais</a>
                                 {% if solicita.procedimento_nome.help_text %}
                                 <p class="help">{{ solicita.procedimento_nome.help_text|safe }}</p>
                                 {% endif %}
-
+                            </div>
+                            <div class="form-row" id="procedimento_div{{ forloop.counter }}B" {% if forloop.counter > proc_count %}style="display: none;"{% endif %}>
+                                {{ solicita.detalhes.errors }}
+                                {{ solicita.detalhes.label_tag }} {{ solicita.detalhes }}
+                                <a class="add_proc">mais</a>
+                                {% if solicita.detalhes.help_text %}
+                                <p class="help">{{ solicita.detalhes.help_text|safe }}</p>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </fieldset>

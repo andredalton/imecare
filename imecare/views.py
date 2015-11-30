@@ -80,6 +80,7 @@ def novo_medico(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def novo_atendimento(request):
+    proc_count = int(request.POST['proc_count']) if request.POST else 1
     nsolicita = 20
     atendimento = AtendimentoForm(request.user, request.POST or None, prefix='atendimento')
     solicitacoes = []
@@ -95,7 +96,7 @@ def novo_atendimento(request):
             if solicita.is_valid():
                 solicita.save()
         return HttpResponseRedirect('/atendimento/novo/')
-    context = {'atendimento': atendimento, 'solicitacoes': solicitacoes, 'procedimentos': procedimentos}
+    context = {'atendimento': atendimento, 'solicitacoes': solicitacoes, 'procedimentos': procedimentos, 'proc_count': proc_count}
     return render_to_response('novo_atendimento.html',
                               context,
                               context_instance=RequestContext(request))

@@ -70,3 +70,4 @@ class Procedimento(models.Model):
 class Solicita(models.Model):
     procedimento = models.ForeignKey(Procedimento)
     atendimento = models.ForeignKey(Atendimento)
+    detalhes = models.TextField(blank=True)
