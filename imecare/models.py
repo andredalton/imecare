@@ -50,7 +50,7 @@ class Pessoa(User):
 class Atendimento(models.Model):
     medico = models.ForeignKey(Pessoa, related_name='medico')
     paciente = models.ForeignKey(Pessoa, related_name='paciente')
-    comentarios = models.TextField(verbose_name='comentários')
+    comentarios = models.TextField(verbose_name='comentários', blank=True)
     data = models.DateField(auto_now=True)
     horario = models.TimeField(auto_now=True)
 
@@ -63,7 +63,6 @@ class Atendimento(models.Model):
 
 
 class Procedimento(models.Model):
-    descricao = models.TextField(verbose_name='descrição')
     nome = models.CharField(max_length=100, primary_key=True)
 
 
@@ -71,3 +70,20 @@ class Solicita(models.Model):
     procedimento = models.ForeignKey(Procedimento)
     atendimento = models.ForeignKey(Atendimento)
     detalhes = models.TextField(blank=True)
+
+
+class Doenca(models.Model):
+    nome = models.CharField(max_length=150, unique=True)
+    cid = models.CharField(max_length=15, primary_key=True)
+    generica = models.ForeignKey("self", null=True)
+
+class Diagnosticada(models.Model):
+    atendimento = models.ForeignKey(Atendimento)
+    doenca = models.ForeignKey(Doenca)
+
+class DiagnosticadaEm(models.Model):
+    paciente = models.ForeignKey(Pessoa)
+    doenca = models.ForeignKey(Doenca)
+    cronica = models.BooleanField(default=False)
+    inicio = models.DateField(auto_now=True)
+    fim = models.DateField(null=True, default=None)

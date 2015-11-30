@@ -4,3 +4,12 @@ input[type="email"],
 input[type="number"] {
     width: 400px;
 }
+
+.highlight {
+    color: blue;
+}
+
+.add_proc,
+.add_doenca {
+    cursor: s-resize;
+}

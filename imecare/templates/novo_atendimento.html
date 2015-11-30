@@ -4,10 +4,18 @@
 {% block jquery %}
     <script>
         var proc_count = {{ proc_count }};
+        var doenca_count = {{ doenca_count }};
 
         var procedimentos = [
             {% for p in procedimentos %}
                 {'value': '{{ p.nome }}', 'label': '{{ p.nome }}'},
+            {% endfor %}
+        ];
+
+        var doencas = [
+            {% for d in doencas %}
+                {'value': '{{ d.nome }}', 'label': 'Nome: {{ d.nome }}'},
+                {'value': '{{ d.nome }}', 'label': 'CID: {{ d.cid }}'},
             {% endfor %}
         ];
 
@@ -32,6 +40,13 @@
                 return $("<li></li>").append($a).appendTo(ul);
             };
 
+            $(".doenca_nome").autocomplete({
+                source: doencas
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>").text(item.label);
+                highlightText(this.term, $a);
+                return $("<li></li>").append($a).appendTo(ul);
+            };
 
             $(".add_proc").click(function(){
                 proc_count += 1;
@@ -39,7 +54,15 @@
                 $("#procedimento_div"+proc_count).fadeIn();
                 $("#procedimento_div"+proc_count+"B").fadeIn();
                 $(this).fadeOut()
-            });;
+            });
+
+            $(".add_doenca").click(function(){
+                doenca_count += 1;
+                $("#doenca_count").val(doenca_count);
+                $("#doenca_div"+doenca_count).fadeIn();
+                $(this).fadeOut()
+                alert("#doenca_div"+doenca_count)
+            });
         });
     </script>
 {% endblock %}
@@ -51,6 +74,7 @@
         <div id="content-main">
             <form id="principal" method="POST">{% csrf_token %}
                 <input type="hidden" id="proc_count" name="proc_count" value="{{ proc_count }}" />
+                <input type="hidden" id="doenca_count" name="doenca_count" value="{{ doenca_count }}" />
                 <div>
                     <fieldset class="module aligned wide">
                         {% for field in atendimento %}
@@ -62,10 +86,21 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
+                        {% for diagnosticada in diagnosticadas %}
+                            <div class="form-row" id="doenca_div{{ forloop.counter }}" {% if forloop.counter > doenca_count %}style="display: none;"{% endif %}>
+                                {{ diagnosticada.doenca_nome.errors }}
+                                {{ diagnosticada.doenca_nome.label_tag }} {{ diagnosticada.doenca_nome }}
+                                {% if forloop.counter >= doenca_count %}<a class="add_doenca">mais</a>{% endif %}
+                                {% if diagnosticada.doenca_nome.help_text %}
+                                <p class="help">{{ diagnosticada.doenca_nome.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                         {% for solicita in solicitacoes %}
                             <div class="form-row" id="procedimento_div{{ forloop.counter }}" {% if forloop.counter > proc_count %}style="display: none;"{% endif %}>
                                 {{ solicita.procedimento_nome.errors }}
                                 {{ solicita.procedimento_nome.label_tag }} {{ solicita.procedimento_nome }}
+                                {% if forloop.counter >= proc_count %}<a class="add_proc">mais</a>{% endif %}
                                 {% if solicita.procedimento_nome.help_text %}
                                 <p class="help">{{ solicita.procedimento_nome.help_text|safe }}</p>
                                 {% endif %}
@@ -73,7 +108,6 @@
                             <div class="form-row" id="procedimento_div{{ forloop.counter }}B" {% if forloop.counter > proc_count %}style="display: none;"{% endif %}>
                                 {{ solicita.detalhes.errors }}
                                 {{ solicita.detalhes.label_tag }} {{ solicita.detalhes }}
-                                <a class="add_proc">mais</a>
                                 {% if solicita.detalhes.help_text %}
                                 <p class="help">{{ solicita.detalhes.help_text|safe }}</p>
                                 {% endif %}

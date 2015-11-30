@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from django import forms
-from models import verifica_cpf, Pessoa, Atendimento, Solicita, Procedimento
+from models import verifica_cpf, Pessoa, Atendimento, Solicita, Procedimento, Doenca, Diagnosticada
 from django.contrib.auth import authenticate, login
 
 def verificaPessoa(form, senha1, senha2, cpf):
@@ -186,3 +186,36 @@ class SolicitaForm(forms.ModelForm):
         if len(procedimento_nome) > 0:
             self.add_error('procedimento_nome', "Digite um nome de procedimento válido.")
         raise forms.ValidationError("Procedimento inválido.")
+
+class DiagnosticadaForm(forms.ModelForm):
+    doenca_nome = forms.CharField(
+        max_length=100,
+        label='doença',
+        required=False,
+        widget=forms.TextInput(
+            attrs={'class': 'doenca_nome'}
+        )
+    )
+
+    class Meta:
+        model = Diagnosticada
+        fields = (
+            'doenca_nome',
+        )
+
+    def set_atendimento(self, atendimento):
+        self.instance.atendimento = atendimento
+
+    def clean(self):
+        doenca_nome = self.cleaned_data.get('doenca_nome')
+
+        try:
+            doenca = Procedimento.objects.get(nome=doenca_nome)
+        except Procedimento.DoesNotExist:
+            doenca = None
+        if doenca:
+            self.instance.doenca = doenca
+            return self.cleaned_data
+        if len(doenca_nome) > 0:
+            self.add_error('doenca_nome', "Digite um nome de doença válida.")
+        raise forms.ValidationError("Doença inválida.")

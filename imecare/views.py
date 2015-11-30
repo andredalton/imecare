@@ -6,8 +6,8 @@ from django.shortcuts import render_to_response, RequestContext, HttpResponseRed
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-from forms import PacienteForm, MedicoForm, AtendimentoForm, TrocarSenhaForm, SolicitaForm
-from models import Pessoa, Atendimento, Procedimento
+from forms import PacienteForm, MedicoForm, AtendimentoForm, TrocarSenhaForm, SolicitaForm, DiagnosticadaForm
+from models import Pessoa, Atendimento, Procedimento, Doenca
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
@@ -80,23 +80,39 @@ def novo_medico(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def novo_atendimento(request):
-    proc_count = int(request.POST['proc_count']) if request.POST else 1
     nsolicita = 20
+    proc_count = int(request.POST['proc_count']) if request.POST else 1
+    doenca_count = int(request.POST['doenca_count']) if request.POST else 1
     atendimento = AtendimentoForm(request.user, request.POST or None, prefix='atendimento')
     solicitacoes = []
+    diagnosticadas = []
     for i in xrange(nsolicita):
         solicitacoes.append(SolicitaForm(request.POST or None, prefix='solicita'+str(i)))
+        diagnosticadas.append(DiagnosticadaForm(request.POST or None, prefix='doenca'+str(i)))
     procedimentos = Procedimento.objects.all()
-
-
+    doencas = Doenca.objects.all()
     if atendimento.is_valid():
         atendimento = atendimento.save()
         for solicita in solicitacoes:
             solicita.set_atendimento(atendimento)
             if solicita.is_valid():
                 solicita.save()
+        for diagnosticada in diagnosticadas:
+            diagnosticada.set_atendimento(atendimento)
+            if diagnosticada.is_valid():
+                diagnosticada.save()
         return HttpResponseRedirect('/atendimento/novo/')
-    context = {'atendimento': atendimento, 'solicitacoes': solicitacoes, 'procedimentos': procedimentos, 'proc_count': proc_count}
+
+    context = {
+        'proc_count': proc_count,
+        'doenca_count': doenca_count,
+        'atendimento': atendimento,
+        'solicitacoes': solicitacoes,
+        'diagnosticadas': diagnosticadas,
+        'procedimentos': procedimentos,
+        'doencas': doencas,
+    }
+
     return render_to_response('novo_atendimento.html',
                               context,
                               context_instance=RequestContext(request))
