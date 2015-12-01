@@ -14,6 +14,20 @@ def verificaPessoa(form, senha1, senha2, cpf):
         form.add_error('senha2', "As senhas devem ser iguais.")
         raise forms.ValidationError("As senhas não são iguais.")
 
+class PacienteSelectForm(forms.Form):
+    cpf = forms.CharField(max_length=30, widget=forms.TextInput(attrs=
+    {
+        'class': 'cpf'
+    }))
+
+    def clean(self):
+        cpf = self.cleaned_data.get('cpf')
+        try:
+            paciente = Pessoa.objects.get(cpf=cpf)
+        except Pessoa.DoesNotExist:
+            self.add_error('cpf', "Este CPF não está cadastrado.")
+            raise forms.ValidationError("CPF inválido.")
+        return self.cleaned_data
 
 class PacienteForm(forms.ModelForm):
     senha = forms.CharField(max_length=30, min_length=5, widget=forms.PasswordInput())
@@ -91,32 +105,21 @@ class MedicoForm(forms.ModelForm):
 
 
 class AtendimentoForm(forms.ModelForm):
-    cpf = forms.CharField(max_length=30, label='CPF do paciente', widget=forms.TextInput(attrs=
-    {
-        'class': 'cpf'
-    }))
-
     class Meta:
         model = Atendimento
         fields = (
-            'cpf',
             'comentarios',
         )
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, paciente, *args, **kwargs):
         self.user = user
+        self.paciente = paciente
         super(AtendimentoForm, self).__init__(*args, **kwargs)
 
     def clean(self):
-        cpf = self.cleaned_data.get('cpf')
-        try:
-            paciente = Pessoa.objects.get(cpf=cpf)
-        except Pessoa.DoesNotExist:
-            self.add_error('cpf', "Este CPF não está cadastrado.")
-            raise forms.ValidationError("CPF inválido.")
         medico = Pessoa.objects.get(cpf=self.user.username)
-        self.instance.paciente = paciente
         self.instance.medico = medico
+        self.instance.paciente = self.paciente
         return self.cleaned_data
 
 class TrocarSenhaForm(forms.Form):
@@ -212,9 +215,6 @@ class DiagnosticadaForm(forms.ModelForm):
             doenca = Doenca.objects.get(nome=doenca_nome)
         except Doenca.DoesNotExist:
             doenca = None
-
-        print doenca, doenca_nome
-
         if doenca:
             self.instance.doenca = doenca
             return self.cleaned_data

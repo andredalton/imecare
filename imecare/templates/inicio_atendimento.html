@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %} - Novo atendimento{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Novo atendimento</h1>
+        <div id="content-main">
+            <form id="principal" method="POST">{% csrf_token %}
+                <input type="hidden" id="proc_count" name="proc_count" value="{{ proc_count }}" />
+                <input type="hidden" id="doenca_count" name="doenca_count" value="{{ doenca_count }}" />
+                <div>
+                    <fieldset class="module aligned wide">
+                        {% for field in form %}
+                            <div class="form-row">
+                                {{ field.errors }}
+                                {{ field.label_tag }} {{ field }}
+                                {% if field.help_text %}
+                                <p class="help">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <div class="submit-row">
+                        <input type="submit" value="Iniciar" class="default" />
+                    </div>
+                    <script type="text/javascript">document.getElementById("id_cpf").focus();</script>
+                </div>
+            </form>
+        </div>
+        <br class="clear" />
+    </div>
+    <div id="footer"></div>
+{% endblock %}

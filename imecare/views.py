@@ -6,8 +6,9 @@ from django.shortcuts import render_to_response, RequestContext, HttpResponseRed
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-from forms import PacienteForm, MedicoForm, AtendimentoForm, TrocarSenhaForm, SolicitaForm, DiagnosticadaForm
-from models import Pessoa, Atendimento, Procedimento, Doenca
+from forms import PacienteForm, MedicoForm, AtendimentoForm, \
+    TrocarSenhaForm, SolicitaForm, DiagnosticadaForm, PacienteSelectForm
+from models import Pessoa, Atendimento, Procedimento, Doenca, DiagnosticadaEm
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
@@ -80,41 +81,61 @@ def novo_medico(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def novo_atendimento(request):
-    nsolicita = 20
-    proc_count = int(request.POST['proc_count']) if request.POST else 1
-    doenca_count = int(request.POST['doenca_count']) if request.POST else 1
-    atendimento = AtendimentoForm(request.user, request.POST or None, prefix='atendimento')
-    solicitacoes = []
-    diagnosticadas = []
-    for i in xrange(nsolicita):
-        solicitacoes.append(SolicitaForm(request.POST or None, prefix='solicita'+str(i)))
-        diagnosticadas.append(DiagnosticadaForm(request.POST or None, prefix='doenca'+str(i)))
-    procedimentos = Procedimento.objects.all()
-    doencas = Doenca.objects.all()
-    if atendimento.is_valid():
-        atendimento = atendimento.save()
-        for solicita in solicitacoes:
-            solicita.set_atendimento(atendimento)
-            if solicita.is_valid():
-                solicita.save()
-        for diagnosticada in diagnosticadas:
-            diagnosticada.set_atendimento(atendimento)
-            if diagnosticada.is_valid():
-                print "Aqui"
-                diagnosticada.save()
-        return HttpResponseRedirect('/atendimento/novo/')
+    if request.POST:
+        cpf = request.POST['cpf']
+        try:
+            paciente = Pessoa.objects.get(cpf=cpf)
+        except Pessoa.DoesNotExist:
+            paciente = None
 
-    context = {
-        'proc_count': proc_count,
-        'doenca_count': doenca_count,
-        'atendimento': atendimento,
-        'solicitacoes': solicitacoes,
-        'diagnosticadas': diagnosticadas,
-        'procedimentos': procedimentos,
-        'doencas': doencas,
-    }
+        if paciente is not None:
+            nsolicita = 20
+            proc_count = int(request.POST['proc_count']) if request.POST['proc_count'] else 1
+            doenca_count = int(request.POST['doenca_count']) if request.POST['doenca_count'] else 1
+            atendimento = AtendimentoForm(request.user, paciente, request.POST or None, prefix='atendimento')
+            solicitacoes = []
+            diagnosticadas = []
+            for i in xrange(nsolicita):
+                solicitacoes.append(SolicitaForm(request.POST or None, prefix='solicita'+str(i)))
+                diagnosticadas.append(DiagnosticadaForm(request.POST or None, prefix='doenca'+str(i)))
+            # expositores = Expositor.objects.filter(user__is_active=block).all().order_by('nome')
+            doencas_ativas = DiagnosticadaEm.objects.filter(paciente=paciente, fim__isnull=True)
+            doencas_curadas = DiagnosticadaEm.objects.filter(paciente=paciente, fim__isnull=False)
+            procedimentos = Procedimento.objects.all()
+            doencas = Doenca.objects.all()
 
-    return render_to_response('novo_atendimento.html',
+            if request.POST['proc_count'] != "":
+                if atendimento.is_valid():
+                    atendimento = atendimento.save()
+                    for solicita in solicitacoes:
+                        solicita.set_atendimento(atendimento)
+                        if solicita.is_valid():
+                            solicita.save()
+                    for diagnosticada in diagnosticadas:
+                        diagnosticada.set_atendimento(atendimento)
+                        if diagnosticada.is_valid():
+                            diagnosticada.save()
+                    return HttpResponseRedirect('/atendimento/novo/')
+
+            context = {
+                'paciente': paciente,
+                'proc_count': proc_count,
+                'doenca_count': doenca_count,
+                'atendimento': atendimento,
+                'solicitacoes': solicitacoes,
+                'diagnosticadas': diagnosticadas,
+                'procedimentos': procedimentos,
+                'doencas': doencas,
+                'doencas_ativas': doencas_ativas,
+                'doencas_curadas': doencas_curadas,
+            }
+
+            return render_to_response('novo_atendimento.html',
+                                      context,
+                                      context_instance=RequestContext(request))
+    form = PacienteSelectForm(request.POST or None)
+    context = {'form': form}
+    return render_to_response('inicio_atendimento.html',
                               context,
                               context_instance=RequestContext(request))
 
