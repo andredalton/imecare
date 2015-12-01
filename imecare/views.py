@@ -100,6 +100,7 @@ def novo_atendimento(request):
         for diagnosticada in diagnosticadas:
             diagnosticada.set_atendimento(atendimento)
             if diagnosticada.is_valid():
+                print "Aqui"
                 diagnosticada.save()
         return HttpResponseRedirect('/atendimento/novo/')
 

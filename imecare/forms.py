@@ -208,11 +208,13 @@ class DiagnosticadaForm(forms.ModelForm):
 
     def clean(self):
         doenca_nome = self.cleaned_data.get('doenca_nome')
-
         try:
-            doenca = Procedimento.objects.get(nome=doenca_nome)
-        except Procedimento.DoesNotExist:
+            doenca = Doenca.objects.get(nome=doenca_nome)
+        except Doenca.DoesNotExist:
             doenca = None
+
+        print doenca, doenca_nome
+
         if doenca:
             self.instance.doenca = doenca
             return self.cleaned_data
