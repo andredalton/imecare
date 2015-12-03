@@ -1,14 +1,14 @@
 # coding=utf-8
 from socket import p
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render_to_response, RequestContext, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 from forms import PacienteForm, MedicoForm, AtendimentoForm, \
     TrocarSenhaForm, SolicitaForm, DiagnosticadaForm, PacienteSelectForm
-from models import Pessoa, Atendimento, Procedimento, Doenca, DiagnosticadaEm
+from models import Pessoa, Atendimento, Procedimento, Doenca, Diagnosticada
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
@@ -17,7 +17,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
-
+from time import strftime
 
 def home(request):
     context = {}
@@ -82,7 +82,12 @@ def novo_medico(request):
 @user_passes_test(lambda u: u.is_staff)
 def novo_atendimento(request):
     if request.POST:
-        cpf = request.POST['cpf']
+        if request.session.has_key('paciente_cpf'):
+            cpf = request.session['paciente_cpf']
+        else:
+            cpf = request.POST['cpf']
+            request.session['paciente_cpf'] = cpf
+
         try:
             paciente = Pessoa.objects.get(cpf=cpf)
         except Pessoa.DoesNotExist:
@@ -99,8 +104,8 @@ def novo_atendimento(request):
                 solicitacoes.append(SolicitaForm(request.POST or None, prefix='solicita'+str(i)))
                 diagnosticadas.append(DiagnosticadaForm(request.POST or None, prefix='doenca'+str(i)))
             # expositores = Expositor.objects.filter(user__is_active=block).all().order_by('nome')
-            doencas_ativas = DiagnosticadaEm.objects.filter(paciente=paciente, fim__isnull=True)
-            doencas_curadas = DiagnosticadaEm.objects.filter(paciente=paciente, fim__isnull=False)
+            doencas_ativas = Diagnosticada.objects.filter(paciente=paciente, fim__isnull=True)
+            doencas_curadas = Diagnosticada.objects.filter(paciente=paciente, fim__isnull=False)
             procedimentos = Procedimento.objects.all()
             doencas = Doenca.objects.all()
 
@@ -115,9 +120,11 @@ def novo_atendimento(request):
                         diagnosticada.set_atendimento(atendimento)
                         if diagnosticada.is_valid():
                             diagnosticada.save()
+                    del request.session['paciente_cpf']
                     return HttpResponseRedirect('/atendimento/novo/')
 
             context = {
+                'cpf': cpf,
                 'paciente': paciente,
                 'proc_count': proc_count,
                 'doenca_count': doenca_count,
@@ -158,3 +165,46 @@ def trocar_senha(request):
     return render_to_response('trocar_senha.html',
                               context,
                               context_instance=RequestContext(request))
+
+
+@login_required
+def teste(request):
+    from pymongo import MongoClient
+
+    client = MongoClient()
+    db = client.test
+
+    result = db.teste.find(
+        {
+            "cuisine": "Italian"
+        }
+    )
+
+    # Close the MongoDB connection
+    client.close()
+
+    context = {'teste': result}
+    return render_to_response('procedimento.html',
+                              context,
+                              context_instance=RequestContext(request))
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def curar_doenca(request, cpf, id):
+    try:
+        diagnostico = Diagnosticada.objects.get(id=id)
+        if diagnostico.paciente.cpf == cpf:
+            print strftime("%Y-%m-%d")
+            if diagnostico.fim is None:
+                txt = "Descurar!"
+                diagnostico.fim = strftime("%Y-%m-%d")
+            else:
+                txt = "Curar!"
+                diagnostico.fim = None
+            diagnostico.save(force_update=True)
+        else:
+            txt = "Menino mau!"
+    except Diagnosticada.DoesNotExist:
+        txt = "Menino mau!"
+    return HttpResponse('{"txt": "' + txt + '"}', content_type='application/json')

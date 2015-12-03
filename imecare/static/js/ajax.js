@@ -12,4 +12,14 @@ $(document).ready(function(){
             $this.children().first().attr('src', "/static/imagem/aberto.png");
         }
     });
+
+    $('.cura').on({
+        'click': function(event) {
+            $this = $(this)
+            event.preventDefault()
+            $.getJSON($(this).attr('href'), function(data) {
+                $this.html(data['txt'])
+            })
+        }
+    });
 });

@@ -71,13 +71,14 @@
         {% endif %}
         <a href="/atendimentos/">{% trans 'Meus atendimentos' %}</a>
         <a href="/">{% trans 'Meus procedimentos' %}</a>
+        <a href="/">{% trans 'Inserir procedimento' %}</a>
         <a href="/trocar_senha/">{% trans 'Alterar senha' %}</a>
         <a href="/sair/">{% trans 'Sair' %}</a>
         {% if user.is_staff %}
             <br />
             <a href="/atendimento/novo/">Novo atendimento</a>
-            <a href="/">Atendimentos realizados</a>
             <a href="/">Meus pacientes</a>
+            <a href="/">Buscar procedimentos</a>
         {% endif %}
     {% else %}
         <form method="post" action="/entrar/"> {% csrf_token %}

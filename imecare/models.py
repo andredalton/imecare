@@ -80,10 +80,13 @@ class Doenca(models.Model):
 class Diagnosticada(models.Model):
     atendimento = models.ForeignKey(Atendimento)
     doenca = models.ForeignKey(Doenca)
-
-class DiagnosticadaEm(models.Model):
+    cronica = models.BooleanField(default=False, verbose_name='crônica')
     paciente = models.ForeignKey(Pessoa)
-    doenca = models.ForeignKey(Doenca)
-    cronica = models.BooleanField(default=False)
     inicio = models.DateField(auto_now=True)
     fim = models.DateField(null=True, default=None)
+
+# class DiagnosticadaEm(models.Model):
+#     paciente = models.ForeignKey(Pessoa)
+#     doenca = models.ForeignKey(Doenca)
+#     inicio = models.DateField(auto_now=True)
+#     fim = models.DateField(null=True, default=None)

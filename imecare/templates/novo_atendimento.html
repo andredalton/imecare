@@ -60,6 +60,7 @@
                 doenca_count += 1;
                 $("#doenca_count").val(doenca_count);
                 $("#doenca_div"+doenca_count).fadeIn();
+                $("#doenca_div"+doenca_count+"B").fadeIn();
                 $(this).fadeOut()
                 alert("#doenca_div"+doenca_count)
             });
@@ -102,7 +103,7 @@
                                 <td>{{ doenca_ativa.doenca.nome }}</td>
                                 <td>{{ doenca_ativa.inicio }}</td>
                                 <td>{% if doenca_ativa.cronica %}Sim{% else %}Não{% endif %}</td>
-                                <td>Curar!</td>
+                                <td><a class="cura" href="/atendimento/curar/{{ paciente.cpf }}/{{ doenca_ativa.id }}/">Curar!</a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -110,38 +111,39 @@
                 </div>
             {% endif %}
 
-            <table>
-                <tr>
-                    <th colspan="6">
-                        <a data-toggle="collapse" href="#diagnosticos"><img width="24" height="auto" />Diagnosticos</a>
-                    </th>
-                </tr>
-            </table>
-            <div id="diagnosticos" class="panel-collapse collapse">
+            {% if doencas_curadas %}
                 <table>
-                    <thead>
                     <tr>
-                        <th>CID</th>
-                        <th>Nome</th>
-                        <th>Início</th>
-                        <th>Término</th>
-                        <th>Crônica</th>
+                        <th colspan="6">
+                            <a data-toggle="collapse" href="#diagnosticos"><img width="24" height="auto" />Diagnosticos</a>
+                        </th>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {% for doenca_curada in doencas_curadas %}
-                        <tr>
-                            <td>{{ doenca_curada.doenca.cid }}</td>
-                            <td>{{ doenca_curada.doenca.nome }}</td>
-                            <td>{{ doenca_curada.inicio }}</td>
-                            <td>{{ doenca_curada.fim }}</td>
-                            <td>{% if doenca_curada.cronica %}Sim{% else %}Não{% endif %}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
                 </table>
+                <div id="diagnosticos" class="panel-collapse collapse">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>CID</th>
+                            <th>Nome</th>
+                            <th>Início</th>
+                            <th>Término</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for doenca_curada in doencas_curadas %}
+                            <tr>
+                                <td>{{ doenca_curada.doenca.cid }}</td>
+                                <td>{{ doenca_curada.doenca.nome }}</td>
+                                <td>{{ doenca_curada.inicio }}</td>
+                                <td>{{ doenca_curada.fim }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
             <form id="principal" method="POST">{% csrf_token %}
+                <input type="hidden" name="cpf" value="{{ cpf }}" />
                 <input type="hidden" id="proc_count" name="proc_count" value="{{ proc_count }}" />
                 <input type="hidden" id="doenca_count" name="doenca_count" value="{{ doenca_count }}" />
                 <div>
@@ -153,6 +155,13 @@
                                 {% if forloop.counter >= doenca_count %}<a class="add_doenca">mais</a>{% endif %}
                                 {% if diagnosticada.doenca_nome.help_text %}
                                 <p class="help">{{ diagnosticada.doenca_nome.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="form-row" id="doenca_div{{ forloop.counter }}B" {% if forloop.counter > doenca_count %}style="display: none;"{% endif %}>
+                                {{ diagnosticada.cronica.errors }}
+                                {{ diagnosticada.cronica.label_tag }} {{ diagnosticada.cronica }}
+                                {% if diagnosticada.cronica.help_text %}
+                                <p class="help">{{ diagnosticada.cronica.help_text|safe }}</p>
                                 {% endif %}
                             </div>
                         {% endfor %}

@@ -16,17 +16,24 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.conf import settings
 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', 'imecare.views.home', name='home'),
-    url(r'^novo_paciente/?$', 'imecare.views.novo_paciente', name='registro_paciente'),
-    url(r'^novo_medico/?$', 'imecare.views.novo_medico', name='registro_medico'),
-    url(r'^entrar/(?P<tipo>\w{0,10})', 'imecare.views.login_user', name='login'),
-    url(r'^sair/?', 'imecare.views.logout_user', name='logout'),
-    url(r'^atendimento/novo/?', 'imecare.views.novo_atendimento', name='registro_atendimento'),
-    url(r'^atendimentos/?', 'imecare.views.atendimentos', name='atendimentos'),
-    url(r'^trocar_senha/?', 'imecare.views.trocar_senha', name='trocar_senha'),
+    url(r'^' + settings.SERVER_FOLDER + 'admin/', include(admin.site.urls)),
+    url(r'^' + settings.SERVER_FOLDER + '$', 'imecare.views.home', name='home'),
+    url(r'^' + settings.SERVER_FOLDER + 'novo_paciente/?$', 'imecare.views.novo_paciente', name='registro_paciente'),
+    url(r'^' + settings.SERVER_FOLDER + 'novo_medico/?$', 'imecare.views.novo_medico', name='registro_medico'),
+    url(r'^' + settings.SERVER_FOLDER + 'entrar/(?P<tipo>\w{0,10})', 'imecare.views.login_user', name='login'),
+    url(r'^' + settings.SERVER_FOLDER + 'sair/?', 'imecare.views.logout_user', name='logout'),
+    url(r'^' + settings.SERVER_FOLDER + 'atendimento/novo/?', 'imecare.views.novo_atendimento', name='registro_atendimento'),
+    url(r'^' + settings.SERVER_FOLDER + 'atendimentos/?', 'imecare.views.atendimentos', name='atendimentos'),
+    url(r'^' + settings.SERVER_FOLDER + 'trocar_senha/?', 'imecare.views.trocar_senha', name='trocar_senha'),
+    url(r'^' + settings.SERVER_FOLDER + 'atendimento/curar/(?P<cpf>[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2})/(?P<id>\d+)/?', 'imecare.views.curar_doenca', name='curar_doenca'),
+
+
+
+
+    url(r'^teste/?', 'imecare.views.teste', name='teste'),
 
 ]

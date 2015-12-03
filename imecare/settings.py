@@ -114,13 +114,15 @@ USE_L10N = True
 USE_TZ = True
 
 
+SERVER_FOLDER = ""
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = os.path.join(SERVER_FOLDER, '/static/')
 
 # Arrumando redirecionamento depois do login.
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = os.path.join(SERVER_FOLDER, '/')
 
 # Configuração de envio de email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -130,3 +132,7 @@ EMAIL_USE_SSL = True
 # EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'imecare@linux.ime.usp.br'
 EMAIL_HOST_PASSWORD = 'projeto'
+
+MONGO_USER = 'test'
+MONGO_PASSWORD = ""
+MONGO_HOST = "127.0.0.1"

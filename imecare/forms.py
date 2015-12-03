@@ -204,6 +204,7 @@ class DiagnosticadaForm(forms.ModelForm):
         model = Diagnosticada
         fields = (
             'doenca_nome',
+            'cronica'
         )
 
     def set_atendimento(self, atendimento):
@@ -217,6 +218,9 @@ class DiagnosticadaForm(forms.ModelForm):
             doenca = None
         if doenca:
             self.instance.doenca = doenca
+            self.instance.paciente = self.instance.atendimento.paciente
+            self.instance.inicio = self.instance.atendimento.data
+
             return self.cleaned_data
         if len(doenca_nome) > 0:
             self.add_error('doenca_nome', "Digite um nome de doença válida.")
