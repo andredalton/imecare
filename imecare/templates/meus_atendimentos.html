@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %} - Novo médico{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Meus atendimentos</h1>
+        <div id="content-main">
+            <div id="doencas_ativas" class="panel-collapse collapse in">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Data</th>
+                        <th>Email</th>
+                        <th>Tipo sanguíneo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for atendimento in atendimentos %}
+                        <tr>
+                            <td><a href="/paciente/{{ atendimento.paciente.cpf }}/">{{ atendimento.paciente.nome }}</a></td>
+                            <td>{{ atendimento.paciente.cpf }}</td>
+                            <td>{{ atendimento.data }}</td>
+                            <td>{{ atendimento.paciente.email }}</td>
+                            <td>{{ atendimento.paciente.tipo_sanguineo }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br class="clear" />
+    </div>
+    <div id="footer"></div>
+{% endblock %}

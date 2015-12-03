@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %} - Teste{% endblock %}
+
+{% block content %}
+    <h1 xmlns="http://www.w3.org/1999/html">Novo procedimento</h1>
+    <form method="post">{% csrf_token %}
+        {% if not valid %}
+            <table>
+                <thead>
+                <tr>
+                    <th>Selecionar</th>
+                    <th>Procedimento</th>
+                    <th>Detalhes</th>
+                    <th>Médico</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="radio" name="solicitacao_id" checked="checked" value="-1"></td>
+                        <td colspan="4">Sem solicitação</td>
+                    </tr>
+                {% for solicitacao in solicitacoes %}
+                    <tr>
+                        <td><input type="radio" name="solicitacao_id" value="{{ solicitacao.id }}"></td>
+                        <td>{{ solicitacao.procedimento.nome }}</td>
+                        <td>{{ solicitacao.detalhes }}</td>
+                        <td>{{ solicitacao.atendimento.medico.nome }}</td>
+                        <td>{{ solicitacao.atendimento.data }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+    {#        {% for solicitacao in solicitacoes %}#}
+    {#            {{  }}<br>#}
+    {#            {{ solicitacao.atendimento.medico.nome }} <br />#}
+    {#            {{ solicitacao.detalhes }} <br /> <br /> <br />#}
+    {#        {% endfor %}#}
+            <input type="submit" value="Inserir dados">
+        {% else %}
+            
+            <input type="text" value="">
+        {% endif %}
+    </form>
+
+{% endblock %}

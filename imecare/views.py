@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 from forms import PacienteForm, MedicoForm, AtendimentoForm, \
     TrocarSenhaForm, SolicitaForm, DiagnosticadaForm, PacienteSelectForm
-from models import Pessoa, Atendimento, Procedimento, Doenca, Diagnosticada
+from models import Pessoa, Atendimento, Procedimento, Doenca, Diagnosticada, Solicita
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
@@ -149,7 +149,7 @@ def novo_atendimento(request):
 @login_required
 def atendimentos(request):
     paciente = Pessoa.objects.get(cpf=request.user.username)
-    atendimentos = Atendimento.objects.filter(paciente=paciente)
+    atendimentos = Atendimento.objects.filter(paciente=paciente).order_by('-data', '-horario')
     context = {'atendimentos': atendimentos}
     return render_to_response('atendimentos.html',
                               context,
@@ -168,23 +168,37 @@ def trocar_senha(request):
 
 
 @login_required
-def teste(request):
-    from pymongo import MongoClient
+def insere_procedimento(request):
+    valid = False
+    if request.POST:
+        solicita_id = request.POST['solicitacao_id']
+        if solicita_id != "-1":
+            try:
+                solicita = Solicita.objects.get(id=solicita_id, atendimento__paciente=request.user)
+                valid = True
+            except Solicita.DoesNotExist:
+                pass
+        else:
+            valid = True
 
-    client = MongoClient()
-    db = client.test
+    # from pymongo import MongoClient
+    # client = MongoClient()
+    # db = client.test
+    #
+    # result = db.teste.find(
+    #     {
+    #         "cuisine": "Italian"
+    #     }
+    # )
+    #
+    # # Close the MongoDB connection
+    # client.close()
 
-    result = db.teste.find(
-        {
-            "cuisine": "Italian"
-        }
-    )
+    solicita = Solicita.objects.filter(atendimento__paciente=request.user).order_by('-atendimento__data', '-atendimento__horario')
 
-    # Close the MongoDB connection
-    client.close()
 
-    context = {'teste': result}
-    return render_to_response('procedimento.html',
+    context = {'solicitacoes': solicita, 'valid': valid}
+    return render_to_response('novo_procedimento.html',
                               context,
                               context_instance=RequestContext(request))
 
@@ -208,3 +222,22 @@ def curar_doenca(request, cpf, id):
     except Diagnosticada.DoesNotExist:
         txt = "Menino mau!"
     return HttpResponse('{"txt": "' + txt + '"}', content_type='application/json')
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def meus_atendimentos(request):
+    atendimentos = Atendimento.objects.filter(medico=request.user).order_by('-data')
+    context = {'atendimentos': atendimentos}
+    return render_to_response('meus_atendimentos.html',
+                              context,
+                              context_instance=RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def paciente(request, cpf):
+    paciente = Pessoa.objects.get(cpf=cpf)
+    context = {'paciente': paciente}
+    return render_to_response('paciente.html',
+                              context,
+                              context_instance=RequestContext(request))
+

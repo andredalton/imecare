@@ -4,21 +4,29 @@
 {% block content %}
     <div id="content" class="colM">
         <h1>Meus atendimentos</h1>
-        <div id="content-main">
-            <table>
-                <tr>
-                    <th>Médico</th>
-                    <th>CRM</th>
-                </tr>
-                {% for atendimento in atendimentos %}
+        {% if atendimentos %}
+            <div id="content-main">
+                <table>
                     <tr>
-                        <td>{{ atendimento.medico.nome }}</td>
-                        <td>{{ atendimento.medico.crm }}</td>
+                        <th>Médico</th>
+                        <th>CRM</th>
+                        <th>Data</th>
+                        <th>Horario</th>
                     </tr>
-                {% endfor %}
+                    {% for atendimento in atendimentos %}
+                        <tr>
+                            <td>{{ atendimento.medico.nome }}</td>
+                            <td>{{ atendimento.medico.crm }}</td>
+                            <td>{{ atendimento.data }}</td>
+                            <td>{{ atendimento.horario }}</td>
+                        </tr>
+                    {% endfor %}
 
-            </table>
-        </div>
+                </table>
+            </div>
+        {% else %}
+            Você não possui nenhum atendimento!
+        {% endif %}
         <br class="clear" />
     </div>
     <div id="footer"></div>

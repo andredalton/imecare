@@ -113,16 +113,13 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-SERVER_FOLDER = ""
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = os.path.join(SERVER_FOLDER, '/static/')
+STATIC_URL = '/static/'
 
 # Arrumando redirecionamento depois do login.
-LOGIN_REDIRECT_URL = os.path.join(SERVER_FOLDER, '/')
+LOGIN_REDIRECT_URL = '/'
 
 # Configuração de envio de email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

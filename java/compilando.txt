@@ -1,3 +1,0 @@
-javac src/**/*.java
-
-java -cp ./src:./src/postgresql-9.4-1205.jdbc42.jar teste.TestaInsere;

@@ -71,11 +71,19 @@ class Solicita(models.Model):
     atendimento = models.ForeignKey(Atendimento)
     detalhes = models.TextField(blank=True)
 
+class Realiza(models.Model):
+    solicitacao = models.ForeignKey(Solicita, null=True, default=None)
+    procedimento = models.ForeignKey(Procedimento)
+    paciente = models.ForeignKey(Pessoa)
+    data = models.DateField(auto_now=True)
+    horario = models.TimeField(auto_now=True)
+
 
 class Doenca(models.Model):
     nome = models.CharField(max_length=150, unique=True)
     cid = models.CharField(max_length=15, primary_key=True)
     generica = models.ForeignKey("self", null=True)
+
 
 class Diagnosticada(models.Model):
     atendimento = models.ForeignKey(Atendimento)
@@ -84,9 +92,3 @@ class Diagnosticada(models.Model):
     paciente = models.ForeignKey(Pessoa)
     inicio = models.DateField(auto_now=True)
     fim = models.DateField(null=True, default=None)
-
-# class DiagnosticadaEm(models.Model):
-#     paciente = models.ForeignKey(Pessoa)
-#     doenca = models.ForeignKey(Doenca)
-#     inicio = models.DateField(auto_now=True)
-#     fim = models.DateField(null=True, default=None)
