@@ -39,8 +39,9 @@
     {#        {% endfor %}#}
             <input type="submit" value="Inserir dados">
         {% else %}
-            
-            <input type="text" value="">
+            <input type="text" name="">
+            <input type="text" name="solicitacao_id" value="{{ solicitacao.id }}" hidden="true">
+            <input type="submit" value="Salvar Procedimento">
         {% endif %}
     </form>
 

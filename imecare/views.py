@@ -174,7 +174,7 @@ def insere_procedimento(request):
         solicita_id = request.POST['solicitacao_id']
         if solicita_id != "-1":
             try:
-                solicita = Solicita.objects.get(id=solicita_id, atendimento__paciente=request.user)
+                solicita = Solicita.objects.get(atendimento__medico=request.user)
                 valid = True
             except Solicita.DoesNotExist:
                 pass
@@ -193,8 +193,7 @@ def insere_procedimento(request):
     #
     # # Close the MongoDB connection
     # client.close()
-
-    solicita = Solicita.objects.filter(atendimento__paciente=request.user).order_by('-atendimento__data', '-atendimento__horario')
+    solicita = Solicita.objects.filter(atendimento__medico=request.user).order_by('-atendimento__data', '-atendimento__horario')
 
 
     context = {'solicitacoes': solicita, 'valid': valid}
