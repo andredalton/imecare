@@ -129,7 +129,3 @@ EMAIL_USE_SSL = True
 # EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'imecare@linux.ime.usp.br'
 EMAIL_HOST_PASSWORD = 'projeto'
-
-MONGO_USER = 'test'
-MONGO_PASSWORD = ""
-MONGO_HOST = "127.0.0.1"

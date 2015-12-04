@@ -1,10 +1,71 @@
 {% extends "base.html" %}
 {% block title %} - Teste{% endblock %}
 
+{% block jquery %}
+    {% if solicitacoes %}
+        <script>
+            var procedimentos = [
+                {% for p in procedimentos %}
+                    {'value': '{{ p.nome }}', 'label': '{{ p.nome }}'},
+                {% endfor %}
+            ];
+
+            $(function() {
+                function highlightText(text, $node) {
+                    var searchText = $.trim(text).toLowerCase(), currentNode = $node.get(0).firstChild, matchIndex, newTextNode, newSpanNode;
+                    while ((matchIndex = currentNode.data.toLowerCase().indexOf(searchText)) >= 0) {
+                        newTextNode = currentNode.splitText(matchIndex);
+                        currentNode = newTextNode.splitText(searchText.length);
+                        newSpanNode = document.createElement("span");
+                        newSpanNode.className = "highlight";
+                        currentNode.parentNode.insertBefore(newSpanNode, currentNode);
+                        newSpanNode.appendChild(newTextNode);
+                    }
+                }
+
+                $(".proc_nome").autocomplete({
+                    source: procedimentos
+                }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                    var $a = $("<a></a>").text(item.label);
+                    highlightText(this.term, $a);
+                    return $("<li></li>").append($a).appendTo(ul);
+                };
+            });
+        </script>
+    {% else %}
+        <script>
+            var campo_count = 1;
+
+            $(function() {
+                $(".add_campo").click(function(){
+                    campo_count += 1;
+                    $("#campo_count").val(campo_count);
+                    $("#conteudo"+campo_count).fadeIn();
+                    $(this).fadeOut()
+                });
+
+                $( ".datepicker" ).datepicker({
+                    dateFormat: 'dd/mm/yy',
+                    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+                    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+                    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                    nextText: 'Próximo',
+                    prevText: 'Anterior',
+                    todayHighlight: true,
+
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
-    <h1 xmlns="http://www.w3.org/1999/html">Novo procedimento</h1>
+    <h1 xmlns="http://www.w3.org/1999/html">Novo procedimento{% if procedimento %}<br />{{ procedimento.nome }}{% endif %}</h1>
+    {% if solicitacao %}Solicitada em: {{ solicitacao.atendimento.data }}{% endif %}
     <form method="post">{% csrf_token %}
-        {% if not valid %}
+        {% if solicitacoes %}
             <table>
                 <thead>
                 <tr>
@@ -18,7 +79,8 @@
                 <tbody>
                     <tr>
                         <td><input type="radio" name="solicitacao_id" checked="checked" value="-1"></td>
-                        <td colspan="4">Sem solicitação</td>
+                        <td>Sem solicitação</td>
+                        <td colspan="3">Nome: <input name="proc_nome" type="text" class="proc_nome"></td>
                     </tr>
                 {% for solicitacao in solicitacoes %}
                     <tr>
@@ -31,17 +93,49 @@
                 {% endfor %}
                 </tbody>
             </table>
-
-    {#        {% for solicitacao in solicitacoes %}#}
-    {#            {{  }}<br>#}
-    {#            {{ solicitacao.atendimento.medico.nome }} <br />#}
-    {#            {{ solicitacao.detalhes }} <br /> <br /> <br />#}
-    {#        {% endfor %}#}
             <input type="submit" value="Inserir dados">
         {% else %}
-            <input type="text" name="">
-            <input type="text" name="solicitacao_id" value="{{ solicitacao.id }}" hidden="true">
-            <input type="submit" value="Salvar Procedimento">
+            <form method="post">
+                <input id="campo_count" type="hidden" name="campo_count" value="1">
+                <input type="text" name="solicitacao_id" value="{{ solicitacao }}" hidden="true">
+                <input type="text" name="proc_nome" value="{{ procedimento.nome }}" hidden="true">
+                <fieldset class="module aligned wide">
+                    <div class="form-row">
+                        Realizada em: <input type="text" class="datepicker" name="data_realizacao">
+                    </div>
+                    {% for foo in loop %}
+                        <div class="form-row" id="conteudo{{ forloop.counter }}" {% if forloop.counter0 > 0 %}style="display: none;"{% endif %}>
+                            <table width="100%">
+                                <tr>
+                                    <td width="15%">
+                                        Campo:
+                                    </td>
+                                    <td>
+                                        <input type="text" name="campo{{ forloop.counter }}"><a class="add_campo">mais</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="15%" height="100px">
+                                        Conteúdo:
+                                    </td>
+                                    <td>
+                                        <textarea rows="15" name="conteudo{{ forloop.counter }}"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="15%">
+                                        Unidade:
+                                    </td>
+                                    <td>
+                                        <input type="text" name="unidade{{ forloop.counter }}">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+                <input type="submit" value="Salvar Procedimento">
+            </form>
         {% endif %}
     </form>
 
