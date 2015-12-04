@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} - Teste{% endblock %}
+{% block title %} - Novo procedimento{% endblock %}
 
 {% block jquery %}
     {% if solicitacoes %}
@@ -62,7 +62,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1 xmlns="http://www.w3.org/1999/html">Novo procedimento{% if procedimento %}<br />{{ procedimento.nome }}{% endif %}</h1>
+    <h1>Novo procedimento{% if procedimento %}<br />{{ procedimento.nome }}{% endif %}</h1>
     {% if solicitacao %}Solicitada em: {{ solicitacao.atendimento.data }}{% endif %}
     <form method="post">{% csrf_token %}
         {% if solicitacoes %}

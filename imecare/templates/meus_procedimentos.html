@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %} - Meus procedimentos{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Meus procedimentos</h1>
+        <div id="content-main">
+            <div class="panel-collapse collapse in">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Procedimento</th>
+                        <th>Médico</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for realizado in realizados %}
+                        <tr>
+                            <td><a href="/procedimento/{{ realizado.id }}/">{{ realizado.procedimento.nome }}</a></td>
+                            <td>
+                                {% if realizado.solicitacao %}
+                                    {{ realizado.solicitacao.atendimento.medico.nome }}
+                                {% else %} Sem responsável{% endif %}
+                            </td>
+                            <td>{{ realizado.data }}</td>
+                            <td>{{ realizado.horario }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br class="clear" />
+    </div>
+    <div id="footer"></div>
+{% endblock %}

@@ -33,5 +33,7 @@ urlpatterns = [
     url(r'^meus/atendimentos/?', 'imecare.views.medico.meus_atendimentos', name='meus_atendimentos'),
     url(r'^paciente/(?P<cpf>[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2})/?', 'imecare.views.medico.paciente', name='paciente'),
     url(r'^novo/procedimento/?', 'imecare.views.mongo.insere_procedimento', name='novo_procedimento'),
-
+    url(r'^meus/procedimento/?', 'imecare.views.paciente.meus_procedimentos', name='novo_procedimento'),
+    url(r'^procedimento/(?P<id>[0-9]+)/?', 'imecare.views.mongo.visualiza_procedimento', name='novo_procedimento'),
+    url(r'^pesquisa/?', 'imecare.views.mongo.pesquisa', name='novo_procedimento'),
 ]

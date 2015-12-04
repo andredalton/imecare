@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %} - Procedimento {{ realizacao.procedimento.nome }}{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Procedimento {{ realizacao.procedimento.nome }}</h1>
+        <p>Realizado em: {{ realizacao.data }} {{ realizacao.horario }}</p>
+        {% if realizacao.solicitacao %}
+            <p>A pedido de: {{ realizacao.solicitacao.atendimento.medico.nome }}</p>
+            <p>Detalhes do pedido: {{ realizacao.solicitacao.detalhes }}</p>
+        {% endif %}
+        <div id="content-main">
+            <div class="panel-collapse collapse in">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Conteúdo</th>
+                        <th>Unidade</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for campo in conteudo.campos %}
+                        <tr>
+                            <td>{{ campo.nome }}</td>
+                            <td>{{ campo.conteudo }}</td>
+                            <td>{{ campo.unidade }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br class="clear" />
+    </div>
+    <div id="footer"></div>
+{% endblock %}

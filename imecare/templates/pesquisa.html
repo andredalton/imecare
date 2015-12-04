@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %} - Pesquisar procedimentos{% endblock %}
+
+{% block jquery %}
+    <script>
+        var campo_count = 1;
+
+        $(function() {
+            $(".add_campo").click(function(){
+                campo_count += 1;
+                $("#campo_count").val(campo_count);
+                $("#conteudo"+campo_count).fadeIn();
+                $(this).fadeOut()
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <h1>Pesquisar procesimentos</h1>
+    {% if not realizados %}
+        <form method="post">{% csrf_token %}
+            <form method="post">
+                <input id="campo_count" type="hidden" name="campo_count" value="1">
+                <input type="text" name="solicitacao_id" value="{{ solicitacao }}" hidden="true">
+                <input type="text" name="proc_nome" value="{{ procedimento.nome }}" hidden="true">
+                <fieldset class="module aligned wide">
+                    <div class="form-row">
+                        <input type="radio" checked="checked" value="and" name="and"> AND<br>
+                        <input type="radio" value="or" name="and"> OR<br>
+                    </div>
+                    {% for foo in loop %}
+                        <div class="form-row" id="conteudo{{ forloop.counter }}" {% if forloop.counter0 > 0 %}style="display: none;"{% endif %}>
+                            <table width="100%">
+                                <tr>
+                                    <td width="15%">
+                                        Campo:
+                                    </td>
+                                    <td>
+                                        <input type="text" name="campo{{ forloop.counter }}"><a class="add_campo">mais</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="15%" height="100px">
+                                        Conteúdo:
+                                    </td>
+                                    <td>
+                                        <textarea rows="15" name="conteudo{{ forloop.counter }}"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="15%">
+                                        Unidade:
+                                    </td>
+                                    <td>
+                                        <input type="text" name="unidade{{ forloop.counter }}">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+                <input type="submit" value="Pesquisar">
+            </form>
+        </form>
+    {% else %}
+        Resultados:
+        <div id="content-main">
+            <div class="panel-collapse collapse in">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Procedimento</th>
+                        <th>Médico</th>
+                        <th>Paciente</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for realizado in realizados %}
+                        <tr>
+                            <td><a href="/procedimento/{{ realizado.id }}/">{{ realizado.procedimento.nome }}</a></td>
+                            <td>
+                                {% if realizado.solicitacao %}
+                                    {{ realizado.solicitacao.atendimento.medico.nome }}
+                                {% else %} Sem responsável{% endif %}
+                            </td>
+                            <td>{{ realizado.paciente.nome }}</td>
+                            <td>{{ realizado.data }}</td>
+                            <td>{{ realizado.horario }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br class="clear" />
+    {% endif %}
+{% endblock %}

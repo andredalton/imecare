@@ -2,7 +2,7 @@
 
 from django.contrib.auth.decorators import login_required
 from ..forms import TrocarSenhaForm
-from ..models import Pessoa, Atendimento
+from ..models import Pessoa, Atendimento, Realiza
 from django.http import *
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -24,5 +24,13 @@ def trocar_senha(request):
         return HttpResponseRedirect('/')
     context = {'form': form}
     return render_to_response('trocar_senha.html',
+                              context,
+                              context_instance=RequestContext(request))
+
+@login_required
+def meus_procedimentos(request):
+    realizados = Realiza.objects.filter(paciente=request.user).order_by('-data', '-horario')
+    context = {'realizados': realizados}
+    return render_to_response('meus_procedimentos.html',
                               context,
                               context_instance=RequestContext(request))

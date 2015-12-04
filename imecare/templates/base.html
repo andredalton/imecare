@@ -72,7 +72,7 @@
             <a target="_blank" href="{% url 'admin:index' %}auth/user/">Usuários</a>
         {% endif %}
         <a href="/atendimentos/">{% trans 'Meus atendimentos' %}</a>
-        <a href="/">{% trans 'Meus procedimentos' %}</a>
+        <a href="/meus/procedimentos/">{% trans 'Meus procedimentos' %}</a>
         <a href="/novo/procedimento/">{% trans 'Inserir procedimento' %}</a>
         <a href="/trocar_senha/">{% trans 'Alterar senha' %}</a>
         <a href="/sair/">{% trans 'Sair' %}</a>
@@ -80,7 +80,7 @@
             <br />
             <a href="/atendimento/novo/">Novo atendimento</a>
             <a href="/meus/atendimentos/">Meus atendimentos</a>
-            <a href="/">Buscar procedimentos</a>
+            <a href="/pesquisa/">Buscar procedimentos</a>
         {% endif %}
     {% else %}
         <form method="post" action="/entrar/"> {% csrf_token %}
