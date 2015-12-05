@@ -26,3 +26,14 @@ Então é necessário recriar o banco através do arquivo: imecare/sql/estrutura
 
 Também é necessário inserir dados de doenças (imecare/sql/insert_doenca_principal.sql) e de
 procedimentos (imecare/sql/insert_procedimentos.sql) antes do sistema funcionar.
+
+Utilização
+========
+
+Uma vez que o sistema esteja instalado, basta iniciar o serviço a partir do comando:
+
+python manage.py runserver 0.0.0.0:8080 
+
+Pode ser passado a este comando um IP e uma porta de acesso diferentes.
+
+Os pacientes e os médicos podem ser cadastrados a partir da página inicial do site. 
