@@ -1,9 +1,39 @@
 {% extends "base.html" %}
-{% block title %} - Novo paciente{% endblock %}
+{% block title %} - Paciente {{ paciente.nome }}{% endblock %}
 
 {% block content %}
     <div id="content" class="colM">
-        <h1>Paciente</h1>
+        <h1>Paciente {{ paciente.nome }}</h1>
+        CPF: {{ paciente.cpf }}<br />
+        RG: {{ paciente.rg }}<br />
+        Data nascimento: {{ paciente.data_nascimento }}<br />
+
+        <div id="content-main">
+            <div id="doencas_ativas" class="panel-collapse collapse in">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Texto</th>
+                        <th>Data</th>
+                        <th>Médico</th>
+                        <th>CRM</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in prontuario %}
+                        <tr>
+                            <td>{{ item.categoria }}</td>
+                            <td>{{ item.texto }}</td>
+                            <td>{{ item.data }}</td>
+                            <td>{{ item.medico.nome }}</td>
+                            <td>{{ item.medico.crm }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <br class="clear" />
     </div>
     <div id="footer"></div>

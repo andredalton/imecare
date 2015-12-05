@@ -66,7 +66,7 @@ def insere_procedimento(request):
             client.close()
             return HttpResponseRedirect(".")
     if valid:
-        context = {'solicitacao': solicita_id, 'procedimento': procedimento, 'loop': loop}
+        context = {'solicita_id': solicita_id, 'solicitacao': solicita, 'procedimento': procedimento, 'loop': loop}
     else:
         procedimentos = Procedimento.objects.all()
         solicita = Solicita.objects.filter(atendimento__paciente=request.user).order_by('-atendimento__data', '-atendimento__horario')

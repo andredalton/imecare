@@ -18,3 +18,11 @@ Instalação
 É necessário instalar as dependências de python (requirements.txt)
 
 pip install -r requirements.txt
+
+Uma vez instaladas as dependências e o django esteja funcionando corretamente, não se deve fazer a migração dos modelos,
+já que o modelo Prontuário é implementado como uma visão.
+
+Então é necessário recriar o banco através do arquivo: imecare/sql/estruturas.sql
+
+Também é necessário inserir dados de doenças (imecare/sql/insert_doenca_principal.sql) e de
+procedimentos (imecare/sql/insert_procedimentos.sql) antes do sistema funcionar.

@@ -92,3 +92,11 @@ class Diagnosticada(models.Model):
     paciente = models.ForeignKey(Pessoa)
     inicio = models.DateField(auto_now=True)
     fim = models.DateField(null=True, default=None)
+
+
+class Prontuario(models.Model):
+    categoria = models.CharField(max_length=20)
+    paciente = models.ForeignKey(Pessoa, related_name='+')
+    medico = models.ForeignKey(Pessoa, null=True, related_name='+')
+    texto = models.CharField(max_length=255)
+    data = models.DateField()

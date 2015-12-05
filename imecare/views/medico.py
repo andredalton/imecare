@@ -2,7 +2,7 @@
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from ..forms import AtendimentoForm, SolicitaForm, DiagnosticadaForm, PacienteSelectForm
-from ..models import Pessoa, Atendimento, Procedimento, Doenca, Diagnosticada
+from ..models import Pessoa, Atendimento, Procedimento, Doenca, Diagnosticada, Prontuario
 from django.http import *
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -109,7 +109,8 @@ def meus_atendimentos(request):
 @user_passes_test(lambda u: u.is_staff)
 def paciente(request, cpf):
     paciente = Pessoa.objects.get(cpf=cpf)
-    context = {'paciente': paciente}
+    prontuario = Prontuario.objects.filter(paciente=paciente)
+    context = {'paciente': paciente, 'prontuario': prontuario}
     return render_to_response('paciente.html',
                               context,
                               context_instance=RequestContext(request))
